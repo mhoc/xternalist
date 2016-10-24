@@ -7,6 +7,7 @@ import { Meteor } from 'meteor/meteor'
 import React, { Component } from 'react'
 
 import EditStudentDialog from './EditStudentDialog'
+import CSVImportDialog from './CSVImportDialog'
 
 const styles = {
   headerContainer: {
@@ -20,13 +21,15 @@ class StudentListDetail extends Component {
     super(props)
     this.state = {
       editStudentDialogOpen: false,
+      importCSVDialogOpen: false,
       studentSelected: null,
     }
   }
 
-  onCancelEdit() {
+  onCloseDialogs() {
     this.setState({
       editStudentDialogOpen: false,
+      importCSVDialogOpen: false,
     })
   }
 
@@ -37,15 +40,19 @@ class StudentListDetail extends Component {
     })
   }
 
+  onClickImportCSV() {
+    this.setState({
+      importCSVDialogOpen: true,
+    })
+  }
+
   renderHeader() {
-    const { studentSelected } = this.state
     return (
       <div style={styles.headerContainer}>
         <RaisedButton 
-          disabled={!studentSelected}
-          label="Edit" 
+          label="Import CSV" 
           secondary={true} 
-          onTouchTap={this.onClickEdit.bind(this)} 
+          onTouchTap={this.onClickImportCSV.bind(this)} 
         />
       </div>
     )
@@ -93,13 +100,21 @@ class StudentListDetail extends Component {
   }
 
   render() {
-    const { editStudentDialogOpen, studentSelected } = this.state
+    const { 
+      editStudentDialogOpen, 
+      importCSVDialogOpen,
+      studentSelected,
+    } = this.state
     return (
       <div>
         <EditStudentDialog
           open={editStudentDialogOpen} 
-          onClose={this.onCancelEdit.bind(this)}
+          onClose={this.onCloseDialogs.bind(this)}
           student={studentSelected}
+        />
+        <CSVImportDialog
+          open={importCSVDialogOpen}
+          onClose={this.onCloseDialogs.bind(this)}
         />
         {this.renderHeader()}
         {this.renderStudentTable()}
