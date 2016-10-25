@@ -1,11 +1,17 @@
-import Divider from 'material-ui/Divider';
+import Divider from 'material-ui/Divider'
 import { List, ListItem } from 'material-ui/List'
 import Paper from 'material-ui/Paper'
 import ActionGrade from 'material-ui/svg-icons/action/grade'
 import CheckCircle from 'material-ui/svg-icons/action/check-circle'
-import React, { Component } from 'react'
+import React, { PropTypes } from 'react'
+import { connect } from 'react-redux'
 
-import AddXternClassDialog from '/imports/ui/components/XternClasses/AddClassDialog'
+import {
+  selectClass,
+  setDetailView,
+  setDialogProps,
+  openDialog,
+} from '/imports/ui/actions'
 
 const containerStyle = {
   width: 275,
@@ -18,28 +24,8 @@ const paperStyle = {
   overflowY: 'scroll',
 }
 
-class XternClassList extends Component {
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      addClassDialogOpen: false,
-    }
-  }
-
-  openAddClassDialog() {
-    this.setState({
-      addClassDialogOpen: true,
-    })
-  }
-
-  closeAddClassDialog() {
-    this.setState({
-      addClassDialogOpen: false,
-    })
-  }
-
-  renderClassItem(c, selectedClass) {
+const XternClassList = ({ classes, dispatch, selectedClass }) => {
+  const renderClassItem = (c, selectedClass) => {
     let rightAvatar = null
     if (selectedClass === c._id) {
       rightAvatar = <CheckCircle />
@@ -47,39 +33,38 @@ class XternClassList extends Component {
     return <ListItem 
       key={c._id} 
       primaryText={c.name}
-      rightIcon={rightAvatar} 
-      onTouchTap={this.props.onSelectClass.bind(null, c._id)} />
+      rightIcon={rightAvatar}
+      onTouchTap={() => {
+        dispatch(selectClass(c._id))
+        dispatch(setDetailView('class'))
+      }}/>
   }
-
-  render() {
-    const { classes, selectedClass } = this.props
-    return (
-      <div style={containerStyle}>
-        <AddXternClassDialog 
-          open={this.state.addClassDialogOpen} 
-          onClose={this.closeAddClassDialog.bind(this)} />
-        <Paper zDepth={2} style={paperStyle}>
-          <List>
-            <ListItem 
-              primaryText="Add A Class" 
-              leftIcon={<ActionGrade />} 
-              onTouchTap={this.openAddClassDialog.bind(this)} />
-          </List>
-          <Divider />
-          <List>
-            {classes.map((c) => this.renderClassItem(c, selectedClass))}
-          </List>
-        </Paper>
-      </div>
-    )
-  }
-
+  return (
+    <div style={containerStyle}>
+      <Paper zDepth={2} style={paperStyle}>
+        <List>
+          <ListItem 
+            primaryText="Add A Class" 
+            leftIcon={<ActionGrade />} 
+            onTouchTap={() => dispatch(openDialog('addClass'))} />
+        </List>
+        <Divider />
+        <List>
+          {classes.map((c) => renderClassItem(c, selectedClass))}
+        </List>
+      </Paper>
+    </div>
+  )
 }
 
 XternClassList.propTypes = {
-  classes: React.PropTypes.array.isRequired,
-  onSelectClass: React.PropTypes.func,
+  classes: PropTypes.array.isRequired,
+  dispatch: PropTypes.func.isRequired,
   selectedClass: React.PropTypes.string,
 }
 
-export default XternClassList
+const mapStateToProps = ({ home }) => ({
+  selectedClass: home.selectedClass,
+})
+
+export default connect(mapStateToProps)(XternClassList)

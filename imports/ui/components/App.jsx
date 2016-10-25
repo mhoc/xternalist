@@ -48,16 +48,13 @@ App.propTypes = {
 
 const AppMeteorContainer = createContainer(() => {
   const subs = [
-    Meteor.subscribe('Companies.all'),
     Meteor.subscribe('Students.all'),
     Meteor.subscribe('XternClasses.all'),
   ]
-  const companies = Companies.find({}).fetch()
   const students = Students.find({}).fetch()
   const user = Meteor.user()
   const xternClasses = XternClasses.find({}).fetch()
   return {
-    companies,
     students,
     xternClasses,
     user,

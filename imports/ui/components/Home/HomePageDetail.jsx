@@ -1,9 +1,9 @@
 
 import Paper from 'material-ui/Paper'
 import { Meteor } from 'meteor/meteor'
-import React, { Component } from 'react'
+import React, { Component, PropTypes } from 'react'
+import { connect } from 'react-redux'
 
-import CompanyDetail from '/imports/ui/components/Companies/CompanyDetail'
 import StudentsDetail from '/imports/ui/components/Students/StudentDetail'
 import XternClassDetail from '/imports/ui/components/XternClasses/ClassDetail'
 
@@ -13,43 +13,33 @@ const paperStyle = {
   padding: '0px 0px 0px 0px',
 }
 
-class HomePageDetail extends Component {
-
-  render() {
-    const { changeDetail, closeDetail, detailView, data } = this.props
-    const detailComponent = (() => {
-      switch (detailView) {
-        case 'class': return <XternClassDetail 
-          classData={data} 
-          changeDetail={changeDetail}
-          closeDetail={closeDetail} />
-        case 'company': return <CompanyDetail 
-          companyData={data}
-          changeDetail={changeDetail}
-          closeDetail={closeDetail} />
-        case 'students': return <StudentsDetail
-          students={data}
-          changeDetail={changeDetail}
-          closeDetail={closeDetail} />
-      }
-    })()
-    return (
-      <Paper style={paperStyle} zDepth={2}>
-        {detailComponent}
-      </Paper>
-    )
-  }
-
+const HomePageDetail = ({ data, detailView, dispatch }) => {
+  const detailComponent = (() => {
+    switch (detailView) {
+      case 'class': return <XternClassDetail 
+        classData={data} />
+      case 'students': return <StudentsDetail
+        students={data} />
+    }
+  })()
+  return (
+    <Paper style={paperStyle} zDepth={2}>
+      {detailComponent}
+    </Paper>
+  )
 }
 
 HomePageDetail.propTypes = {
-  data: React.PropTypes.oneOfType([
-    React.PropTypes.object,
-    React.PropTypes.array,
+  data: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.array,
   ]).isRequired,
-  detailView: React.PropTypes.string.isRequired,
-  changeDetail: React.PropTypes.func.isRequired,
-  closeDetail: React.PropTypes.func.isRequired,
+  detailView: PropTypes.string,
+  dispatch: PropTypes.func.isRequired,
 }
 
-export default HomePageDetail
+const mapStateToProps = ({ home }) => ({
+  detailView: home.detailView,
+})
+
+export default connect(mapStateToProps)(HomePageDetail)
