@@ -9,6 +9,7 @@ import { connect } from 'react-redux'
 
 import {
   getCandidatesForStudent,
+  setDetailView,
   setDialogProps,
   setEditStudentEmail,
   setEditStudentName,
@@ -18,16 +19,27 @@ import {
 
 const styles = {
   headerContainer: {
-    padding: "12px",
-  }
+    flexDirection: 'row',
+    padding: '12px',
+  },
+  headerButton: {
+    margin: '8px',
+  },
 }
 
 const renderHeader = (dispatch) => {
   return (
     <div style={styles.headerContainer}>
+      <RaisedButton
+        style={styles.headerButton}
+        label="Back"
+        secondary={true}
+        onTouchTap={() => dispatch(setDetailView('class'))} 
+      />
       <RaisedButton 
+        style={styles.headerButton}
         label="Import CSV" 
-        secondary={true} 
+        primary={true}
         onTouchTap={() => dispatch(openDialog('importStudentCsv'))}
       />
     </div>

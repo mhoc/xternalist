@@ -3,8 +3,8 @@ import Paper from 'material-ui/Paper'
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-import StudentsDetail from '/imports/ui/components/Students/StudentDetail'
-import XternClassDetail from '/imports/ui/components/XternClasses/ClassDetail'
+import StudentsDetail from '/imports/ui/components/Home/StudentDetail'
+import XternClassDetail from '/imports/ui/components/Home/ClassDetail'
 
 const styles = {
   container: {
