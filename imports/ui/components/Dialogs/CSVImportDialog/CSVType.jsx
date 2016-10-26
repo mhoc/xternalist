@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import {
   RadioButton, 
   RadioButtonGroup,
@@ -17,26 +18,30 @@ const styles = {
   },
 }
 
-const CSVType = ({ dispatch, selected }) => {
+const allTypes = [
+  { label: 'Basic Data', value: 'basicStudent' },
+  { label: 'Scheduling', value: 'companyScheduling' },
+]
+
+const CSVType = ({ dispatch, selected, showTypes }) => {
   return (
     <RadioButtonGroup 
       name="csvUploadType" 
       onChange={(e, v) => dispatch(setSelectedCsvType(v))}
       valueSelected={selected}>
-      <RadioButton 
-        checkedIcon={<ActionFavorite />}
-        label="Basic" 
-        style={styles.radioButton}
-        uncheckedIcon={<ActionFavoriteBorder />}
-        value="basic" 
-      />
-      <RadioButton
-        checkedIcon={<ActionFavorite />}
-        label="Company Scheduling"
-        style={styles.radioButton}
-        uncheckedIcon={<ActionFavoriteBorder />}
-        value="companyScheduling"
-      />
+      {
+        _(allTypes)
+          .filter((t) => _.includes(showTypes, t.value))
+          .map((t) => <RadioButton
+            checkedIcon={<ActionFavorite />}
+            key={t.value}
+            label={t.label} 
+            style={styles.radioButton}
+            uncheckedIcon={<ActionFavoriteBorder />}
+            value={t.value} />
+          )
+          .value()
+      }
     </RadioButtonGroup>
   )
 }

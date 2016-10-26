@@ -46,15 +46,22 @@ const renderStepper = (activeStep, dispatch) => {
   </Stepper>
 }
 
-const renderBody = (activeStep, dispatch) => {
+const renderBody = (activeStep, dispatch, showTypes) => {
   switch (activeStep) {
-    case 0: return <CSVType />
+    case 0: return <CSVType showTypes={showTypes} />
     case 1: return <CSVPasteTextField />
     case 2: return <CSVConfirm />
   }
 }
 
-const CSVImportDialog = ({ activeStep, dispatch, open, text, type }) => {
+const CSVImportDialog = ({ 
+  activeStep, 
+  dispatch, 
+  open,
+  showTypes, 
+  text, 
+  type,
+}) => {
   const leftLabel = activeStep === 0 ? 'Cancel' : 'Back'
   const rightLabel = activeStep === 2 ? 'Finish' : 'Next'
 
@@ -89,7 +96,7 @@ const CSVImportDialog = ({ activeStep, dispatch, open, text, type }) => {
     onRequestClose={() => onClose(dispatch)}>
       <div style={{width: '100%', maxHeight: 700, maxWidth: 700, margin: 'auto'}}>
         {renderStepper(activeStep, dispatch)}
-        {renderBody(activeStep, dispatch)}
+        {renderBody(activeStep, dispatch, showTypes)}
       </div>
     </Dialog>
 }
@@ -98,6 +105,7 @@ CSVImportDialog.propTypes = {
   activeStep: PropTypes.number.isRequired,
   dispatch: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
+  showTypes: PropTypes.array,
 }
 
 const mapStateToProps = ({ csv }) => ({

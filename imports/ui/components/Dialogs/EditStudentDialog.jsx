@@ -60,7 +60,7 @@ const renderBody = (email, name, school, candidates, dispatch) => {
   return (
     <div>
       <TextField hintText={"Email"} onChange={(e) => dispatch(setEditStudentEmail(e.target.value))} value={email} />
-      <RaisedButton style={{margin: '4px'}} label={"Send Email"} href={mailto} primary={true} />
+      <RaisedButton style={{marginLeft: '8px'}} label={"Send Email"} href={mailto} primary={true} />
       <br />
       <TextField hintText={"Name"} onChange={(e) => dispatch(setEditStudentName(e.target.value))} value={name} />
       <br />
@@ -101,7 +101,7 @@ const EditStudentDialog = ({
       title="Edit Student"
       actions={actions}
       open={open}
-      onRequestClose={() => onClose()}>
+      onRequestClose={() => onClose(dispatch)}>
       {renderBody(editStudentEmail, editStudentName, editStudentSchool, candidateCompanies, dispatch)}
     </Dialog>
   )

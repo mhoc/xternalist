@@ -34,7 +34,7 @@ Meteor.methods({
       throw new Meteor.Error(400, "Error parsing your CSV file.")
     }
     csvData = _.tail(csvData)
-    if (type === 'basic') {
+    if (type === 'basicStudent') {
       _.forEach(csvData, (dp) => {
         const [ email, name, school ] = dp
         let existing = Students.findOne({ email })

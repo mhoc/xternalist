@@ -7,7 +7,7 @@ import {
 
 const initialState = {
   activeStep: 0,
-  csvType: 'basic',
+  csvType: 'basicStudent',
   error: null,
   text: "",
 }
