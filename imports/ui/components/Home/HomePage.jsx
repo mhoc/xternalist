@@ -1,44 +1,50 @@
 import _ from 'lodash'
-import React, { Component } from 'react'
+import Paper from 'material-ui/Paper'
+import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-import XternClassList from '/imports/ui/components/XternClasses/ClassList'
-import HomePageDetail from '/imports/ui/components/Home/HomePageDetail'
+import StudentsDetail from '/imports/ui/components/Students/StudentDetail'
+import XternClassDetail from '/imports/ui/components/XternClasses/ClassDetail'
 
-const containerStyle = {
-  display: 'flex',
-  flex: '1 1 auto',
-  height: '90vh',
-  overflowY: 'hidden',
+const styles = {
+  container: {
+    display: 'flex',
+    flex: '1 1 auto',
+    height: '90vh',
+    overflowY: 'hidden',
+  },
+  paper: {
+    flexGrow: 1,
+    margin: '20px 20px 20px 20px',
+    padding: '0px 0px 0px 0px',
+  },
 }
 
-const HomePage = ({ detailView, selectedClass, students, user, xternClasses }) => {
-  let selectedData = []
-  if (detailView === 'class') {
-    selectedData = _.find(xternClasses, { _id: selectedClass })
-  } else if (detailView === 'students') {
-    selectedData = _.filter(students, { classId: selectedClass })
-  }
+const HomePage = ({ companies, detailView, selectedClass, students, user }) => {
+  const detailComponent = (() => {
+    switch (detailView) {
+      case 'class': return <XternClassDetail />
+      case 'students': return <StudentsDetail students={students} />
+    }
+  })()
   return (
-    <div style={containerStyle}>
-      <div style={{display: 'flex', flexDirection: 'column' }}>
-        <XternClassList classes={xternClasses} />
-      </div>
-      {detailView
-        && <HomePageDetail data={selectedData} />}
+    <div style={styles.container}>
+      <Paper style={styles.paper} zDepth={2}>
+        {detailComponent}
+      </Paper>
     </div>
   )
 }
 
 HomePage.propTypes = {
-  students: React.PropTypes.array.isRequired,
-  user: React.PropTypes.object.isRequired,
-  xternClasses: React.PropTypes.array.isRequired,
+  companies: PropTypes.array.isRequired,
+  detailView: PropTypes.string.isRequired,
+  students: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired,
 }
 
 const mapStateToProps = ({ home }) => ({
   detailView: home.detailView,
-  selectedClass: home.selectedClass,
 })
 
 export default connect(mapStateToProps)(HomePage)

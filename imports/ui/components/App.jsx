@@ -8,7 +8,6 @@ import React, { Component } from 'react'
 
 import { Companies } from '/imports/api/Companies'
 import { Students } from '/imports/api/Students'
-import { XternClasses } from '/imports/api/XternClasses'
 
 import AppBar from '/imports/ui/components/AppBar'
 import Dialog from '/imports/ui/components/Dialogs'
@@ -22,7 +21,7 @@ const appContainerStyle = {
 class App extends Component {
 
   render() {
-    const { companies, students, user, xternClasses } = this.props
+    const { companies, students, user } = this.props
     return (
       <div>
         <Dialog />
@@ -32,7 +31,7 @@ class App extends Component {
             companies={companies}
             students={students}
             user={user} 
-            xternClasses={xternClasses} />}
+          />}
         </div>
       </div>
     )
@@ -42,21 +41,20 @@ class App extends Component {
 
 App.propTypes = {
   companies: React.PropTypes.array,
-  xternClasses: React.PropTypes.array,
   user: React.PropTypes.object,
 }
 
 const AppMeteorContainer = createContainer(() => {
   const subs = [
+    Meteor.subscribe('Companies.all'),
     Meteor.subscribe('Students.all'),
-    Meteor.subscribe('XternClasses.all'),
   ]
+  const companies = Companies.find({}).fetch()
   const students = Students.find({}).fetch()
   const user = Meteor.user()
-  const xternClasses = XternClasses.find({}).fetch()
   return {
+    companies,
     students,
-    xternClasses,
     user,
   }
 }, App)

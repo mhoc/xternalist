@@ -19,42 +19,32 @@ const paperStyle = {
   margin: 20,
 }
 
-const XternClassDetail = ({ classData, dispatch }) => {
-  const onDialogConfirm = () => {
-    Meteor.call('XternClasses.remove', classData._id, (err) => {
-      dispatch(setDetailView(null))
-      dispatch(closeDialog())
-    })
-  }
-  const openConfirmRemove = () => {
-    dispatch(setDialogProps({
-      onClose: () => dispatch(closeDialog()),
-      onConfirm: onDialogConfirm,
-    }))
-    dispatch(openDialog('confirmRemoveClass'))
-  }
+const doSchedule = ({ dispatch }) => {
+  Meteor.call('Students.schedule', (err, resp) => {
+    if (err) console.error(err)
+    console.log(resp)
+    //dispatch(openDialog('scheduleResults'))
+  })
+}
+
+const XternClassDetail = ({ dispatch }) => {
   return (
     <List>
-      <Subheader>{classData.name}</Subheader>
+      <Subheader>{"Xtern Class"}</Subheader>
       <ListItem
         primaryText="Students"
-        secondaryText="You can add students manually, import a CSV, or wait until finalist day and send out a form" 
+        secondaryText="You can add students manually or import a CSV" 
         onTouchTap={() => dispatch(setDetailView('students'))} />
-      <ListItem 
-        style={{color: '#F44336'}}
-        primaryText="Remove Class" 
-        onTouchTap={openConfirmRemove} />
+      <ListItem
+        primaryText="Schedule"
+        secondaryText="Create a schedule for Xtern Finalist day. Make sure you've imported a company schedule csv"
+        onTouchTap={() => doSchedule({ dispatch })} />
     </List>
   )
 }
 
 XternClassDetail.propTypes = {
-  classData: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
 }
 
-const mapStateToProps = ({ }) => ({
-  
-})
-
-export default connect(mapStateToProps)(XternClassDetail)
+export default connect()(XternClassDetail)

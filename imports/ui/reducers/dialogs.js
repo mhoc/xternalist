@@ -3,7 +3,6 @@ import {
   OPEN_DIALOG,
   SET_DIALOG_PROPS,
   SET_LOGIN_ERROR,
-  SET_NEW_CLASS_NAME,
   SET_EDIT_STUDENT_NAME,
   SET_EDIT_STUDENT_EMAIL,
   SET_EDIT_STUDENT_SCHOOL,
@@ -18,7 +17,6 @@ const initialState = {
   loginEmail: "",
   loginError: null,
   loginPassword: "",
-  newClassName: "",
   openDialog: null,
 }
 
@@ -36,8 +34,6 @@ export default (state = initialState, action) => {
       return { ...state, loginPassword: action.password }
     case SET_LOGIN_ERROR:
       return { ...state, loginError: action.loginError }
-    case SET_NEW_CLASS_NAME:
-      return { ...state, newClassName: action.newClassName }
     case SET_EDIT_STUDENT_NAME:
       return { ...state, editStudentName: action.editStudentName }
     case SET_EDIT_STUDENT_EMAIL:

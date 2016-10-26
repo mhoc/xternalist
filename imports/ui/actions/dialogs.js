@@ -34,12 +34,6 @@ export const setLoginError = (err) => ({
   loginError: err,
 })
 
-export const SET_NEW_CLASS_NAME = "SET_NEW_CLASS_NAME"
-export const setNewClassName = (name) => ({
-  type: SET_NEW_CLASS_NAME,
-  newClassName: name,
-})
-
 export const SET_EDIT_STUDENT_EMAIL = "SET_EDIT_STUDENT_EMAIL"
 export const setEditStudentEmail = (email) => ({
   type: SET_EDIT_STUDENT_EMAIL,

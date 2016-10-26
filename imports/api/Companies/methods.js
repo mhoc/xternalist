@@ -14,7 +14,7 @@ Meteor.methods({
     })
   },
 
-  'Companies.patchCandidatePrefs'(classId, data) {
+  'Companies.patchCandidatePrefs'(data) {
     _.forEach(data, (dp) => {
       const name = dp[0]
       const candidates = _.tail(dp)

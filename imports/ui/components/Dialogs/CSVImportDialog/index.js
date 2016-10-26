@@ -21,16 +21,21 @@ import CSVConfirm from './CSVConfirm'
 import CSVType from './CSVType'
 import CSVPasteTextField from './CSVPasteTextField'
 
-const onNextAfterCsv = (activeStep, classId, text, type, dispatch) => {
+const onNextAfterCsv = (activeStep, text, type, dispatch) => {
   dispatch(setCsvError(null))
-  Meteor.call('Students.patchCsv', type, classId, text, (err, resp) => {
+  Meteor.call('Students.patchCsv', type, text, (err, resp) => {
     if (err) dispatch(setCsvError(err))
     dispatch(setActiveStep(activeStep + 1))
   })
 }
 
-const onFinish = (dispatch) => {
+const onClose = (dispatch) => {
+  dispatch(setActiveStep(0))
   dispatch(closeDialog())
+}
+
+const onFinish = (dispatch) => {
+  closeDialog()
 } 
 
 const renderStepper = (activeStep, dispatch) => {
@@ -49,20 +54,20 @@ const renderBody = (activeStep, dispatch) => {
   }
 }
 
-const CSVImportDialog = ({ activeStep, dispatch, open, classId, text, type }) => {
+const CSVImportDialog = ({ activeStep, dispatch, open, text, type }) => {
   const leftLabel = activeStep === 0 ? 'Cancel' : 'Back'
   const rightLabel = activeStep === 2 ? 'Finish' : 'Next'
 
   const leftAction = (() => {
     switch (activeStep) {
-      case 0: return () => dispatch(closeDialog())
+      case 0: return () => onClose(dispatch)
       default: return () => dispatch(setActiveStep(activeStep - 1))
     }
   })()
 
   const rightAction = (() => {
     switch (activeStep) {
-      case 1: return () => onNextAfterCsv(activeStep, classId, text, type, dispatch)
+      case 1: return () => onNextAfterCsv(activeStep, text, type, dispatch)
       case 2: return () => onFinish(dispatch)
       default: return () => dispatch(setActiveStep(activeStep + 1))
     }
@@ -81,7 +86,7 @@ const CSVImportDialog = ({ activeStep, dispatch, open, classId, text, type }) =>
     title="Import CSV"
     actions={actions}
     open={open}
-    onRequestClose={() => dispatch(closeDialog())}>
+    onRequestClose={() => onClose(dispatch)}>
       <div style={{width: '100%', maxHeight: 700, maxWidth: 700, margin: 'auto'}}>
         {renderStepper(activeStep, dispatch)}
         {renderBody(activeStep, dispatch)}
@@ -95,9 +100,8 @@ CSVImportDialog.propTypes = {
   open: PropTypes.bool.isRequired,
 }
 
-const mapStateToProps = ({ csv, home }) => ({
+const mapStateToProps = ({ csv }) => ({
   activeStep: csv.activeStep,
-  classId: home.selectedClass,
   text: csv.text,
   type: csv.csvType,
 })

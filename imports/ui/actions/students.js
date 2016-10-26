@@ -6,7 +6,6 @@ export const getCandidatesForStudent = (studentId) => (
     Meteor.call('Students.getCandidateCompanies', studentId, (err, resp) => {
       if (err) console.error(err)
       else dispatch(setCandidatesForStudent(studentId, resp))
-      console.log(resp)
     }) 
   }
 )

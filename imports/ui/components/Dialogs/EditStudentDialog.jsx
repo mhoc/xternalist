@@ -101,7 +101,7 @@ const EditStudentDialog = ({
       title="Edit Student"
       actions={actions}
       open={open}
-      onRequestClose={() => dispatch(onClose)}>
+      onRequestClose={() => onClose()}>
       {renderBody(editStudentEmail, editStudentName, editStudentSchool, candidateCompanies, dispatch)}
     </Dialog>
   )

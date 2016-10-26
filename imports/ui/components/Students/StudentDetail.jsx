@@ -34,8 +34,7 @@ const renderHeader = (dispatch) => {
   )
 }
 
-const renderStudentRow = (s, selected, dispatch) => {
-  const isSelected = selected && selected._id === s._id
+const renderStudentRow = (s, dispatch) => {
   const onClick = () => {
     dispatch(setDialogProps({ student: s }))
     dispatch(setEditStudentEmail(s.email))
@@ -46,8 +45,7 @@ const renderStudentRow = (s, selected, dispatch) => {
   }
   return (
     <TableRow key={s.email} 
-      onTouchTap={onClick}
-      selected={isSelected}>
+      onTouchTap={onClick}>
       <TableRowColumn>{s.email}</TableRowColumn>
       <TableRowColumn>{s.name}</TableRowColumn>
       <TableRowColumn>{s.school}</TableRowColumn>
@@ -55,7 +53,7 @@ const renderStudentRow = (s, selected, dispatch) => {
   )
 }
 
-const renderStudentTable = (students, selected, dispatch) => {
+const renderStudentTable = (students, dispatch) => {
   return (
     <Table 
       fixedHeader={true} 
@@ -76,29 +74,24 @@ const renderStudentTable = (students, selected, dispatch) => {
         displayRowCheckbox={false}
         showRowHover={true}
         >
-        {students.map((s) => renderStudentRow(s, selected, dispatch))}
+        {students.map((s) => renderStudentRow(s, dispatch))}
       </TableBody>
     </Table>
   )
 }
 
-const StudentListDetail = ({ dispatch, selectedStudent, students }) => {
+const StudentListDetail = ({ dispatch, students }) => {
   return (
     <div>
       {renderHeader(dispatch)}
-      {renderStudentTable(students, selectedStudent, dispatch)}
+      {renderStudentTable(students, dispatch)}
     </div>
   )
 }
 
 StudentListDetail.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  selectedStudent: PropTypes.object,
   students: PropTypes.array.isRequired,
 }
 
-const mapStateToProps = ({ home }) => ({
-  selectedStudent: home.selectedStudent,
-})
-
-export default connect(mapStateToProps)(StudentListDetail)
+export default connect()(StudentListDetail)

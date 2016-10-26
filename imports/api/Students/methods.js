@@ -25,7 +25,7 @@ Meteor.methods({
     })
   },
 
-  'Students.patchCsv'(type, classId, data) {
+  'Students.patchCsv'(type, data) {
     if (!this.userId) throw new Meteor.Error(401, 'unauthorized')
     let csvData = null
     try {
@@ -37,16 +37,16 @@ Meteor.methods({
     if (type === 'basic') {
       _.forEach(csvData, (dp) => {
         const [ email, name, school ] = dp
-        let existing = Students.findOne({ classId, email })
+        let existing = Students.findOne({ email })
         if (existing) {
           existing = _.assign(existing, { name, school })
           Meteor.call('Students.update', existing) 
         } else {
-          Meteor.call('Students.create', { classId, email, name, school })
+          Meteor.call('Students.create', { email, name, school })
         }
       })
     } else if (type === 'companyScheduling') {
-      Meteor.call('Companies.patchCandidatePrefs', classId, csvData)
+      Meteor.call('Companies.patchCandidatePrefs', csvData)
     }
   },
 
@@ -56,7 +56,6 @@ Meteor.methods({
   },
 
   'Students.getCandidateCompanies'(studentId) {
-    console.log(studentId)
     if (!this.userId) throw new Meteor.Error(401, 'unauthorized')
     return Companies.find({ candidates: studentId }).fetch()
   },
