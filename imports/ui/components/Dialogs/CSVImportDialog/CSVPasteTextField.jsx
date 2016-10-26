@@ -8,7 +8,8 @@ import {
 
 const getHelpText = (type) => {
   switch (type) {
-    case 'basic': return 'Email,Name,School'
+    case 'basic': return 'Email, Name, School'
+    case 'companyScheduling': return 'CompanyName, CandidateEmail1, CandidateEmail2, ...'
   }
 }
 

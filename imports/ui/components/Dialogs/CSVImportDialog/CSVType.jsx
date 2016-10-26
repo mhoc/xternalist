@@ -30,6 +30,13 @@ const CSVType = ({ dispatch, selected }) => {
         uncheckedIcon={<ActionFavoriteBorder />}
         value="basic" 
       />
+      <RadioButton
+        checkedIcon={<ActionFavorite />}
+        label="Company Scheduling"
+        style={styles.radioButton}
+        uncheckedIcon={<ActionFavoriteBorder />}
+        value="companyScheduling"
+      />
     </RadioButtonGroup>
   )
 }

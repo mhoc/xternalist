@@ -8,6 +8,7 @@ import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 
 import {
+  getCandidatesForStudent,
   setDialogProps,
   setEditStudentEmail,
   setEditStudentName,
@@ -41,6 +42,7 @@ const renderStudentRow = (s, selected, dispatch) => {
     dispatch(setEditStudentName(s.name))
     dispatch(setEditStudentSchool(s.school))
     dispatch(openDialog('editStudent'))
+    dispatch(getCandidatesForStudent(s._id))
   }
   return (
     <TableRow key={s.email} 

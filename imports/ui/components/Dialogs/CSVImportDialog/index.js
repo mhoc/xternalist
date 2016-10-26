@@ -22,6 +22,7 @@ import CSVType from './CSVType'
 import CSVPasteTextField from './CSVPasteTextField'
 
 const onNextAfterCsv = (activeStep, classId, text, type, dispatch) => {
+  dispatch(setCsvError(null))
   Meteor.call('Students.patchCsv', type, classId, text, (err, resp) => {
     if (err) dispatch(setCsvError(err))
     dispatch(setActiveStep(activeStep + 1))
@@ -77,7 +78,7 @@ const CSVImportDialog = ({ activeStep, dispatch, open, classId, text, type }) =>
     />,
   ]
   return <Dialog
-    title="Import Student CSV"
+    title="Import CSV"
     actions={actions}
     open={open}
     onRequestClose={() => dispatch(closeDialog())}>

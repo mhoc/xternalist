@@ -9,6 +9,8 @@ import { connect } from 'react-redux'
 
 import {
   closeDialog,
+  getCandidatesForStudent,
+  setCandidatesForStudent,
   setEditStudentEmail,
   setEditStudentName,
   setEditStudentSchool,
@@ -26,6 +28,10 @@ const onSubmit = (student, email, name, school, dispatch) => {
   })
 }
 
+const onClose = (dispatch) => {
+  dispatch(closeDialog())
+}
+
 const onRemove = (student, dispatch) => {
   Meteor.call('Students.remove', student._id, (err) => {
     if (err) console.error(err)
@@ -33,7 +39,23 @@ const onRemove = (student, dispatch) => {
   })
 }
 
-const renderBody = (email, name, school, dispatch) => {
+const renderCandidates = (companies) => {
+  if (companies.length === 0) {
+    return <h3>Candidate Nowhere</h3>
+  } else {
+    return (
+      <div>
+        <h3>Candidate At...</h3>
+        <span>{companies.map((c, i) => {
+          const prefix = i !== 0 ? ', ' : ''
+          return <span key={c._id}>{prefix}{c.name}</span>
+        })}</span>
+      </div>
+    )
+  }
+}
+
+const renderBody = (email, name, school, candidates, dispatch) => {
   const mailto = `mailto:${email}`
   return (
     <div>
@@ -43,15 +65,24 @@ const renderBody = (email, name, school, dispatch) => {
       <TextField hintText={"Name"} onChange={(e) => dispatch(setEditStudentName(e.target.value))} value={name} />
       <br />
       <TextField hintText={"School"} onChange={(e) => dispatch(setEditStudentSchool(e.target.value))} value={school} />
+      {candidates ? renderCandidates(candidates) : null}
     </div>
   )
 }
 
-const EditStudentDialog = ({ dispatch, editStudentEmail, editStudentName, editStudentSchool, open, student }) => {
+const EditStudentDialog = ({ 
+  candidateCompanies,
+  dispatch, 
+  editStudentEmail, 
+  editStudentName, 
+  editStudentSchool, 
+  open, 
+  student,
+}) => {
   const actions = [
     <FlatButton
       label="Cancel"
-      onTouchTap={() => dispatch(closeDialog())}
+      onTouchTap={() => onClose(dispatch)}
     />,
     <FlatButton
       style={{color: '#F44336'}}
@@ -70,13 +101,14 @@ const EditStudentDialog = ({ dispatch, editStudentEmail, editStudentName, editSt
       title="Edit Student"
       actions={actions}
       open={open}
-      onRequestClose={() => dispatch(onClose())}>
-      {renderBody(editStudentEmail, editStudentName, editStudentSchool, dispatch)}
+      onRequestClose={() => dispatch(onClose)}>
+      {renderBody(editStudentEmail, editStudentName, editStudentSchool, candidateCompanies, dispatch)}
     </Dialog>
   )
 }
 
 EditStudentDialog.propTypes = {
+  candidateCompanies: PropTypes.array,
   dispatch: PropTypes.func.isRequired,
   editStudentEmail: PropTypes.string.isRequired,
   editStudentName: PropTypes.string.isRequired,
@@ -85,10 +117,18 @@ EditStudentDialog.propTypes = {
   student: React.PropTypes.object,
 }
 
-const mapStateToProps = ({ dialogs }) => ({
-  editStudentEmail: dialogs.editStudentEmail,
-  editStudentName: dialogs.editStudentName,
-  editStudentSchool: dialogs.editStudentSchool,
-})
+const mapStateToProps = ({ dialogs, students }, { student }) => {
+  let getKeys = {
+    editStudentEmail: dialogs.editStudentEmail,
+    editStudentName: dialogs.editStudentName,
+    editStudentSchool: dialogs.editStudentSchool,
+  }
+  if (student) {
+    getKeys = _.assign(getKeys, {
+      candidateCompanies: _.get(students, `candidateCompanies.${student._id}`),
+    })
+  }
+  return getKeys
+}
 
 export default connect(mapStateToProps)(EditStudentDialog)
