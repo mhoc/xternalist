@@ -6,6 +6,7 @@ import {
   SET_EDIT_STUDENT_NAME,
   SET_EDIT_STUDENT_EMAIL,
   SET_EDIT_STUDENT_SCHOOL,
+  SET_EDIT_COMPANY_NAME,
   UPDATE_LOGIN_EMAIL,
   UPDATE_LOGIN_PASSWORD,
 } from '/imports/ui/actions'
@@ -14,6 +15,7 @@ const initialState = {
   editStudentEmail: "",
   editStudentName: "",
   editStudentSchool: "",
+  editCompanyName: "",
   loginEmail: "",
   loginError: null,
   loginPassword: "",
@@ -40,6 +42,8 @@ export default (state = initialState, action) => {
       return { ...state, editStudentEmail: action.editStudentEmail }
     case SET_EDIT_STUDENT_SCHOOL:
       return { ...state, editStudentSchool: action.editStudentSchool }
+    case SET_EDIT_COMPANY_NAME:
+      return { ...state, editCompanyName: action.editCompanyName }
     default:
       return state
   }

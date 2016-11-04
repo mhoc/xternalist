@@ -3,6 +3,7 @@ import Paper from 'material-ui/Paper'
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 
+import CompanyDetail from '/imports/ui/components/Home/CompanyDetail'
 import StudentsDetail from '/imports/ui/components/Home/StudentDetail'
 import XternClassDetail from '/imports/ui/components/Home/ClassDetail'
 
@@ -25,6 +26,7 @@ const HomePage = ({ companies, detailView, selectedClass, students, user }) => {
     switch (detailView) {
       case 'class': return <XternClassDetail />
       case 'students': return <StudentsDetail students={students} />
+      case 'companies': return <CompanyDetail companies={companies} />
     }
   })()
   return (

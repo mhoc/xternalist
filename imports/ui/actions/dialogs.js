@@ -51,3 +51,9 @@ export const setEditStudentSchool = (school) => ({
   type: SET_EDIT_STUDENT_SCHOOL,
   editStudentSchool: school,
 }) 
+
+export const SET_EDIT_COMPANY_NAME = "SET_EDIT_COMPANY_NAME"
+export const setEditCompanyName = (name) => ({
+  type: SET_EDIT_COMPANY_NAME,
+  editCompanyName: name,
+})
