@@ -13,7 +13,7 @@ export const RunScheduler = (basePath) => {
   const parseCsv = Meteor.wrapAsync(parse)
   const companies = _(parseCsv(fs.readFileSync(`${basePath}/cCandidates.csv`)))
     .tail()
-    .map(([ name, ...candidates ]) => ({ name, candidates: _.compact(candidates) }))
+    .map(([ name, department, ...candidates ]) => ({ name: `${name} - ${department}`, candidates: _.compact(candidates) }))
     .value()
   _(parseCsv(fs.readFileSync(`${basePath}/cRoles.csv`)))
     .tail()
@@ -27,5 +27,6 @@ export const RunScheduler = (basePath) => {
   Schedule({
     companies,
     students,
+    toFile: `${basePath}/export.csv`,
   })
 }

@@ -54,7 +54,7 @@ import _ from 'lodash'
 
 const DEFAULT_N_ROUNDS = 8
 const DEFAULT_MIN_STUDENT_IVIEWS = 2
-const DEFAULT_MAX_STUDENT_IVIEWS = 4
+const DEFAULT_MAX_STUDENT_IVIEWS = 3
 
 export const Schedule = ({
   companies,
@@ -70,58 +70,70 @@ export const Schedule = ({
 
   // Clean up the input as much as possible.
   // lowercase all company names, roles, and candidate emails
-  companies = _.map(companies, (company) => {
+  companies = _(companies).filter((c) => {
+    return !!c.name 
+  }).map((company) => {
     return {
       name: company.name.toLowerCase(),
-      roles: _.map(company.roles || [], (role) => {
-        return role.toLowerCase()
-      }),
+      // roles: _.map(company.roles || [], (role) => {
+      //   return role.toLowerCase()
+      // }),
       candidates: _.map(company.candidates || [], (candidate) => {
         return candidate.toLowerCase()
       }),
     }
-  })
+  }).value()
+
+  students = _.reduce(companies, (obj, company) => {
+    _.forEach(company.candidates, (candidate) => {
+      if (!obj[candidate]) {
+        obj[candidate] = { email: candidate, roles: [] }
+      }
+    })
+    return obj
+  }, {})
+  students = _.map(students, (stuObj) => stuObj)
 
   // lowercase all student email addresses and roles 
-  students = _.map(students, (student) => {
-    return {
-      email: student.email.toLowerCase(),
-      roles: _.map(student.roles || [], (role) => {
-        return role.toLowerCase()
-      }),
-    }
-  })
+  // students = _.map(students, (student) => {
+  //   return {
+  //     email: student.email.toLowerCase(),
+  //     roles: _.map(student.roles || [], (role) => {
+  //       return role.toLowerCase()
+  //     }),
+  //   }
+  // })
 
   // Sanity checks to make sure that the two data sources have accurate references to each other
   // Check to make sure companies reference candidates that exist
-  _.forEach(companies, (company) => {
-    _.forEach(company.candidates, (candidate) => {
-      const student = _.find(students, (s) => s.email === candidate)
-      if (!student) console.error(`warning: ${company.name} ref student ${candidate} ✗`)
-    })
-  })
+  // _.forEach(companies, (company) => {
+  //   _.forEach(company.candidates, (candidate) => {
+  //     const student = _.find(students, (s) => s.email === candidate)
+  //     if (!student) console.error(`warning: ${company.name} ref student ${candidate} ✗`)
+  //   })
+  // })
 
-  // Check to make sure companies reference roles that at least one student has
-  _.forEach(companies, (company) => {
-    _.forEach(company.roles, (role) => {
-      if (!_.some(students, (student) => {
-        return _.includes(student.roles, role)
-      })) {
-        console.error(`warning: ${company.name} ref role ${role} ✗`)
-      }
-    })
-  })
+  // // Check to make sure companies reference roles that at least one student has
+  // _.forEach(companies, (company) => {
+  //   _.forEach(company.roles, (role) => {
+  //     if (!_.some(students, (student) => {
+  //       return _.includes(student.roles, role)
+  //     })) {
+  //       console.error(`warning: ${company.name} ref role ${role} ✗`)
+  //     }
+  //   })
+  // })
 
-  // Reverse: check to make sure students reference roles that at least one company wants
-  _.forEach(students, (student) => {
-    _.forEach(student.roles, (role) => {
-      if (!_.some(companies, (company) => {
-        return _.includes(company.roles, role)
-      })) {
-        console.error(`warning: ${student.email} ref role ${role} ✗`)
-      }
-    })
-  })
+  // // Reverse: check to make sure students reference roles that at least one company wants
+  // _.forEach(students, (student) => {
+  //   _.forEach(student.roles, (role) => {
+  //     if (!_.some(companies, (company) => {
+  //       return _.includes(company.roles, role)
+  //     })) {
+  //       console.error(`warning: ${student.email} ref role ${role} ✗`)
+  //     }
+  //   })
+  // })
 
   // Previous interviews per student. This is stored globally considering we 
   // make a lot of per-company and per-round copies of objects in the 
@@ -155,11 +167,17 @@ export const Schedule = ({
         } else if (_.includes(busyStudents, student.email)) {
           student._score = 0
         } else if (_.includes(company.candidates, student.email)) {
-          student._score = 1
+          // student._score = 1
+          const index = _.findIndex(company.candidates, (c) => c === student.email)
+          if (index >= 0) {
+            student._score = (21 - index) / 21  
+          }
         } else if (_.some(company.roles, (role) => _.includes(student.roles, role))) {
-          student._score = 0.9
+          // student._score = 0.9
+          student._score = 0
         } else {
-          student._score = Math.max(Math.min(1 - (interviewHistory[student.email].length / minStudentInterviews), 0.80), 0.10)  
+          student._score = 0.03
+          // student._score = Math.max(Math.min(1 - (interviewHistory[student.email].length / minStudentInterviews), 0.03), 0.01)  
         }
         return student
       })
@@ -167,7 +185,7 @@ export const Schedule = ({
 
       // If the score is zero, this company has no great candidates, and thus 
       // will not have a candidate this round. This should rarely happen.
-      if (highestScore._score < 0.01) return {
+      if (highestScore._score === 0) return {
         round: roundNumber,
         company,
         student: null,
@@ -212,7 +230,7 @@ const printMatches = (matches, interviewHistory, minStudentInterviews) => {
     const cnt = student ? interviewHistory[sn].length : '-'
     console.log(`${r} ${cn} => ${sn} (s:${sc}) (n:${cnt})`)
   })
-  const countBelow = _.reduce(interviewHistory, (accum, candidateHistory, emai) => {
+  const countBelow = _.reduce(interviewHistory, (accum, candidateHistory) => {
     if (candidateHistory.length < minStudentInterviews) {
       return accum + 1
     }
@@ -222,7 +240,11 @@ const printMatches = (matches, interviewHistory, minStudentInterviews) => {
     console.log(`=== no candidates below minimum threshold (${minStudentInterviews}) :)`)
   } else {
     console.log('=== candidates below min threshold')
-    _.forEach(interviewHistory, (candidateHistory, email) => console.log(`${email}`))
+    _.forEach(interviewHistory, (candidateHistory, email) => {
+      if (candidateHistory.length < minStudentInterviews) {
+        console.log(`${email} (${candidateHistory.length})`)
+      }
+    })
   }
 }
 
@@ -246,98 +268,3 @@ const exportToCsv = (matches, toFile) => {
   })
 }
 
-export const TestSchedule = () => {
-  Schedule({
-    toFile: '/Users/mike/src/xtern-manager/export.csv',
-    companies: [
-      { 
-        name: 'High Alpha', 
-        candidates: [ 'Mike', 'Ben' ],
-        roles: [ 'frontend', 'backend', 'design', 'it' ],
-      },
-      { 
-        name: 'Angies List', 
-        candidates: [ 'Kyle', 'Tylor', 'Kate' ],
-        roles: [ 'frontend', 'pm' ],
-      },
-      { 
-        name: 'TechPoint', 
-        candidates: [ 'Fran', 'Nichole', 'Alex' ],
-        roles: [ 'hr' ],
-      },
-      { 
-        name: 'BidPal', 
-        candidates: [ 'Ashley', 'Aaron' ],
-        roles: [ 'frontend' ],
-      },
-      { 
-        name: 'InIn', 
-        candidates: [ 'Mike', 'Ben', 'Nathan' ],
-        roles: [ 'frontend', 'backend', 'hr' ],
-      },
-      {
-        name: 'NextGear',
-        candidates: [ 'Harrison', 'Schutter' ],
-        roles: [ 'backend' ],
-      }
-    ],
-    students: [
-      { 
-        email: 'Mike',
-        roles: [ 'frontend', 'backend' ],
-      },
-      { 
-        email: 'Kyle',
-        roles: [ 'backend' ],
-      },
-      { 
-        email: 'Tylor',
-        roles: [ 'frontend' ],
-      },
-      { 
-        email: 'Nichole',
-        roles: [ 'hr' ],
-      },
-      {
-        email: 'Ashley',
-        roles: [ 'frontend' ],
-      },
-      { 
-        email: 'Ben',
-        roles: [ 'frontend' ],
-      },
-      { 
-        email: 'Alex',
-        roles: [ 'hr', 'frontend' ],
-      },
-      { 
-        email: 'Fran',
-        roles: [ 'hr' ],
-      },
-      { 
-        email: 'Chelsie',
-        roles: [ 'design' ], 
-      },
-      { 
-        email: 'Ian',
-        roles: [ 'backend' ],
-      },
-      { 
-        email: 'Ryan',
-        roles: [ 'hr', 'partnerships' ],
-      },
-      {
-        email: 'Harrison',
-        roles: [ 'backend' ],
-      },
-      {
-        email: 'Schutter',
-        roles: [ 'frontend' ],
-      },
-      {
-        email: 'Kate',
-        roles: [ 'pm' ],
-      },
-    ]
-  })
-}
